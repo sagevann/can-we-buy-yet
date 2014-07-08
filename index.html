@@ -66,13 +66,20 @@
 
 
     <div class="container">
+    <style>
+    .subordinate{
+      position: absolute;
+      opacity: 0.4;
+      line-height: 34px;
+      right: 77px;
+      z-index: 1000;
+    }
+    .input-group .form-control.subordinate::before{
+      content: '$';
+    }
+    </style>
       <!-- Example row of columns 
-//price
-  //apr
-  //down
-  //fee_pct
-  //tax_pct
-  //d_by_pct
+    
 
       -->
       <div class="well">
@@ -86,14 +93,14 @@
               <span class="input-group-addon">$</span>
               <input type="number" name="price"
              pattern="[0-9]+([\.|,][0-9]+)?" step="10000"
-             id="price" type="text" class="form-control" placeholder="450,000">
+             id="price" type="text" class="form-control" value="450000" placeholder="450,000">
               <span class="input-group-addon">.00</span>
             </div>
           </div>
           <div class="form-group col-md-3">
             <label for="apr">APR</label>
             <div class="input-group">
-              <input type="text" class="form-control" id="apr" placeholder="4.0">
+              <input type="text" class="form-control" id="apr" value="4.5" placeholder="4.0">
               <span  class="input-group-addon">%</span>
             </div>
           </div>
@@ -101,15 +108,18 @@
             <label for="down">Down Payment</label>
            
             <div class="input-group">
-               <input type="text" class="form-control" id="down" placeholder="20.0">
-              <span id="down-toggle" data-toggle-target="#down" class="input-group-addon pct">%</span>
+               <input type="text" step="0.5" class="form-control" id="pct-down" value="20.0" placeholder="20.0">
+                <span  id="dollars-down" class="subordinate">($90,000)</span>
+                <input type="hidden" id="down" value="20.0">
+              <span id="down-toggle" data-toggle-target="#down" class="input-group-addon pct" style="width: 39px;
+padding: 0;">%</span>
             </div>
           </div>
         </div>
         <div class="row">
         <div class="form-group col-md-3">
             <label for="term">Length</label>
-            <input type="text" class="form-control" id="term" placeholder="30">
+            <input type="text" class="form-control" id="term" value="30" placeholder="30">
           </div>
            <div class="form-group col-md-3">
             <label for="fees">Closing Costs</label>

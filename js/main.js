@@ -107,44 +107,73 @@ var togglePercent = function( e ){
 
 }
 
-$('#down-toggle').bind( 'click', function( ){
-	var t = $(this)
-	
-	if( t.hasClass('pct') ){
-		t.text('$')
-		$( t.data('toggle-target') ).attr('placeholder', '$5000')
-		t.removeClass('pct').addClass('$')
-	} else {
-		t.text('%')
-		
 
-		$( t.data('toggle-target') ).attr('placeholder', '20%')
-		t.removeClass('$').addClass('pct')
 
-	}
-	
+function convertDownToDollars( ){
+	var value = $('#pct-down').val() / 100.0 * $('#price').val()
+	return value.toFixed(0)
+}
 
-} )
-$('#calculate-payment').click( function(e){
-	e.preventDefault();
+function convertDownToPct( ){
+	var value = $('#dollars-dow').val() / $('#price').val()
+	return value.toFixed(2)
+}
+
+function makeMortageFromForm(  )
+{
+
 	var o = {}
+		
 		o.price	= parseInt($('#price').val() )|| base.price
-		o.apr 	= $('#apr').val() / 100 || base.apr
-		o.dPct 	= $('#down').val() / 100 || base.down.pct
+		o.apr 	= $('#apr').val() / 100.0 || base.apr
+		o.dPct 	= $('#pct-down').val() / 100.0 || base.down.pct
 		o.term = $('#term').val() || base.term
 
 	console.log( o)
 	//	fees 	= $('fees'),
 	//	tax 	= $('property-tax')
-	var mtg = new Mortgage( o )
-	$('.payment').text('$'+ mtg.payment().toFixed(2))
+	return new Mortgage( o )
 
-})
+}
+
+function updateBaseMortgage( ){
+	$('.payment').text('$'+ base_mtg.payment().toFixed(2))
+}
+
+
 	var exp = new Expenses()
 	var home_450_7 = new HomePurchase()
 	var mtg_450_7 = new Mortgage()
 	var mtg_350_22 = new Mortgage( { price: 350000, dPct: 0.22} )
 	var mtg_350_35k = new Mortgage( { price: 350000, down: 35022, term: 15} )
 
+var base_mtg = new Mortgage()
+
+$(function(){
+
+	updateBaseMortgage( )
+	$('.converted-down').text(convertDownToDollars())
+
+	$('#calculate-payment').click( function(e){
+		e.preventDefault();
+		base_mtg = makeMortageFromForm( )
+		updateBaseMortgage( )
+	})
+
+	$('#price,#pct-down,#apr,#term').on('change', function(){
+		base_mtg = makeMortageFromForm()
+		updateBaseMortgage( )
+
+
+	})
+
+
+	$('#pct-down').on('change', function(){
+		$('#dollars-down').text('($'+convertDownToDollars()+')')
+		$('#down').val(convertDownToDollars())
+	})
+
+	
+})
 
 
