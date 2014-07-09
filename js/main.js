@@ -29,6 +29,9 @@ function mtgPrincipal( price, down, pct ){
 function downPayment( P, i ){
 	return P * i
 }
+
+
+/*
 	var Expenses = Backbone.Model.extend({
 		defaults: {
 			other: base.exp.other,
@@ -98,7 +101,7 @@ function downPayment( P, i ){
 		}
 
 	});//HomePurchase
-
+*/
 
 function convertDownToDollars( form_id ){
 	var p = $(form_id)
@@ -144,7 +147,6 @@ function calcPayment( form_id ){
 
 function updateMortgage( form_id ){
 	console.log('updatemtg ' + form_id)
-	var mtg = form_id == '#buy-now-mtg' ? now_mtg_bb : then_mtg_bb
 	var p = $(form_id)
 	var pmt = calcPayment( form_id )
 	console.log(pmt)
@@ -157,8 +159,8 @@ function updateDown( form_id ){
 	p.find('.down').val(down)
 }
 
-var now_mtg_bb = new Mortgage()
-var then_mtg_bb = new Mortgage()
+//var now_mtg_bb = new Mortgage()
+//var then_mtg_bb = new Mortgage()
 
 var mtgs = { now: "#buy-now-mtg", then: "#buy-then-mtg"}
 
