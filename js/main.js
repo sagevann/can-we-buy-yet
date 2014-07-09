@@ -140,6 +140,10 @@ function updateBaseMortgage( ){
 	$('.payment').text('$'+ base_mtg.payment().toFixed(2))
 }
 
+function updateDown( ){
+	$('#dollars-down').text('($'+convertDownToDollars()+')')
+		$('#down').val(convertDownToDollars())
+}
 
 	var exp = new Expenses()
 	var home_450_7 = new HomePurchase()
@@ -163,14 +167,13 @@ $(function(){
 	$('#price,#pct-down,#apr,#term').on('change', function(){
 		base_mtg = makeMortageFromForm()
 		updateBaseMortgage( )
-
+		updateDown()
 
 	})
 
 
 	$('#pct-down').on('change', function(){
-		$('#dollars-down').text('($'+convertDownToDollars()+')')
-		$('#down').val(convertDownToDollars())
+		updateDown()
 	})
 
 	
