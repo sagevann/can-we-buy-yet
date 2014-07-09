@@ -100,34 +100,26 @@ function downPayment( P, i ){
 	});//HomePurchase
 
 
-var togglePercent = function( e ){
-		e.data.t.text('$')
-	
-		$(e.data.t.data['toggle-target']).attr('placeholder', '$5000')
-
-}
-
-
-
-function convertDownToDollars( ){
-	var value = $('#pct-down').val() / 100.0 * $('#price').val()
+function convertDownToDollars( form_id ){
+	var p = $(form_id)
+	var value = p.find('.pct-down').val() / 100.0 * p.find('.price').val()
 	return value.toFixed(0)
 }
 
-function convertDownToPct( ){
-	var value = $('#dollars-dow').val() / $('#price').val()
+function convertDownToPct( form_id ){
+	var value = p.find('.dollars-dow').val() / p.find('.price').val()
 	return value.toFixed(2)
 }
 
-function makeMortageFromForm(  )
+function makeMortageFromForm( form_id )
 {
-
+	var p = $(form_id)
 	var o = {}
 		
-		o.price	= parseInt($('#price').val() )|| base.price
-		o.apr 	= $('#apr').val() / 100.0 || base.apr
-		o.dPct 	= $('#pct-down').val() / 100.0 || base.down.pct
-		o.term = $('#term').val() || base.term
+		o.price	= parseInt( p.find('.price').val() )|| base.price
+		o.apr 	= p.find('.apr').val() / 100.0 || base.apr
+		o.dPct 	= p.find('.pct-down').val() / 100.0 || base.down.pct
+		o.term = p.find('.term').val() || base.term
 
 	console.log( o)
 	//	fees 	= $('fees'),
@@ -136,44 +128,93 @@ function makeMortageFromForm(  )
 
 }
 
-function updateBaseMortgage( ){
-	$('.payment').text('$'+ base_mtg.payment().toFixed(2))
+function calcPayment( form_id ){  
+	var p = $(form_id),
+		P = p.find('.price').val() * (1- p.find('.pct-down').val()/100.0 )
+		i = p.find('.apr').val() / 1200.0
+		n = p.find('.term').val() * 12.0
+		In = Math.pow( (1 + i), n )
+
+	console.log( i + ',' + n +',' +In)
+	var payment = P * ( ( i * In) / (In - 1) )
+	console.log( payment)
+	return payment = payment.toFixed(2)
+	
 }
 
-function updateDown( ){
-	$('#dollars-down').text('($'+convertDownToDollars()+')')
-		$('#down').val(convertDownToDollars())
+function updateMortgage( form_id ){
+	console.log('updatemtg ' + form_id)
+	var mtg = form_id == '#buy-now-mtg' ? now_mtg_bb : then_mtg_bb
+	var p = $(form_id)
+	var pmt = calcPayment( form_id )
+	console.log(pmt)
+	p.find('.payment').text('$'+ pmt )
 }
 
-	var exp = new Expenses()
-	var home_450_7 = new HomePurchase()
-	var mtg_450_7 = new Mortgage()
-	var mtg_350_22 = new Mortgage( { price: 350000, dPct: 0.22} )
-	var mtg_350_35k = new Mortgage( { price: 350000, down: 35022, term: 15} )
+function updateDown( form_id ){
+	var p = $(form_id), down = convertDownToDollars(form_id)
+	p.find('.dollars-down').text('($'+down+')')
+	p.find('.down').val(down)
+}
 
-var base_mtg = new Mortgage()
+var now_mtg_bb = new Mortgage()
+var then_mtg_bb = new Mortgage()
+
+var mtgs = { now: "#buy-now-mtg", then: "#buy-then-mtg"}
+
+var now_mtg = {}
+now_mtg.$p = $(mtgs.now)
+now_mtg.id = '#buy-now-mtg'
+now_mtg.updateDown = updateDown;
+now_mtg.updateMortgage = updateMortgage
+now_mtg.$price =	now_mtg.$p.find('.price')
+now_mtg.$pctDown =	now_mtg.$p.find('.pct-down')
+now_mtg.$apr = 		now_mtg.$p.find('.apr')
+now_mtg.$term = 	now_mtg.$p.find('.term')
+now_mtg.views = [ now_mtg.id + ' .price', now_mtg.id + ' .pct-down', now_mtg.id + ' .apr', now_mtg.id + ' .term']
+
+var then_mtg = {}
+then_mtg.$p = $(mtgs.then)
+then_mtg.id = '#buy-then-mtg'
+then_mtg.updateDown = updateDown;
+then_mtg.updateMortgage = updateMortgage
+then_mtg.$price =	then_mtg.$p.find('.price')
+then_mtg.$pctDown =	then_mtg.$p.find('.pct-down')
+then_mtg.$apr = 		then_mtg.$p.find('.apr')
+then_mtg.$term = 	then_mtg.$p.find('.term')
+then_mtg.views = [ then_mtg.id + ' .price', then_mtg.id + ' .pct-down', then_mtg.id + ' .apr', then_mtg.id + ' .term']
+
 
 $(function(){
 
-	updateBaseMortgage( )
-	$('.converted-down').text(convertDownToDollars())
-
+	now_mtg.updateMortgage( mtgs.now)
+	then_mtg.updateMortgage( mtgs.then)
+	
 	$('#calculate-payment').click( function(e){
 		e.preventDefault();
-		base_mtg = makeMortageFromForm( )
+		now_mtg = makeMortageFromForm( )
 		updateBaseMortgage( )
 	})
 
-	$('#price,#pct-down,#apr,#term').on('change', function(){
-		base_mtg = makeMortageFromForm()
-		updateBaseMortgage( )
-		updateDown()
+	$(now_mtg.views.join(',')).on('change', function(){
+		//now_mtg = makeMortageFromForm( mtgs.now)
+		now_mtg.updateMortgage( mtgs.now )
+		updateDown(mtgs.now)
+
+	})
+
+	$(then_mtg.views.join(',')).on('change', function(){
+		//now_mtg = makeMortageFromForm( mtgs.now)
+		console.log('then')
+		then_mtg.updateMortgage( mtgs.then )
+		updateDown(mtgs.then)
 
 	})
 
 
-	$('#pct-down').on('change', function(){
-		updateDown()
+	now_mtg.$pctDown.on('change', function(){
+
+		updateDown(mtgs.now)
 	})
 
 	
