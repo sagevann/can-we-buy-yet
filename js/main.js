@@ -12,22 +12,6 @@ base.exp = {}
 base.exp.other = 7200
 base.exp.rent = 300
 
-
-
-function mtgPrincipal( price, down, pct ){
-	//default to calculating by pct
-	pct = typeof pct === 'undefined' ? true : false
-
-	if( pct ){
-		down = down > 1 ? down / 100 : down
-		return price - downPayment( price, down)
-	} else {
-		return price - down
-	}
-
-
-}
-
 function appreciateHouse( price, months, rate ){
 	if(typeof rate === 'undefined') rate = base.appreciation
 
@@ -40,85 +24,6 @@ function appreciateHouse( price, months, rate ){
 		months -= 1
 		return appreciateHouse( price, months, rate)
 	}
-}
-
-function downPayment( P, i ){
-	return P * i
-}
-
-
-/*
-	var Expenses = Backbone.Model.extend({
-		defaults: {
-			other: base.exp.other,
-			rent: base.exp.rent
-		},
-		total: function(){ return this.get('other') + this.get('rent')}
-
-	});//Expenses
-
-	var Payment = Backbone.Model.extend({
-		defaults: {
-			number: 0
-
-		}
-
-	});//payment
-
-	var Mortgage = Backbone.Model.extend({
-		defaults:{
-			price : base.price,
-			apr : base.apr,
-			down : base.down.$,
-			dPct : base.down.pct,
-			principal : base.price - base.down.$,
-			term : base.term,
-			periods: 12
-		},
-		payment: function(){  
-			 	P = this.get('principal'),
-				i = this.get('apr') / this.get('periods'),
-				n = this.get('term') * this.get('periods'),
-				In = Math.pow( (1 + i), n ),
-				payment = P * ( ( i * In) / (In - 1) )
-
-			return payment;
-		},
-		initialize: function(o){
-			if( o ){
-				this.set({price: o.price || base.price})
-				if(typeof o.dPct !== 'undefined'){		
-					this.set({ down: this.get('price') * o.dPct});
-				 } else { 
-					 	this.set({ down: o.down || base.down.$});
-				 } 
-				//console.log(this.down)
-				this.set({ principal: (this.get('price') - this.get('down'))} )
-				this.set({ apr: o.apr || base.apr } )
-				this.set({ term: o.term || base.term })
-			}
-		}
-
-	});//Mortgage
-
-	//price
-	//apr
-	//down
-	//fee_pct
-	//tax_pct
-	//d_by_pct
-	
-*/
-
-function convertDownToDollars( form_id ){
-	var p = $(form_id)
-	var value = p.find('.pct-down').val() / 100.0 * p.find('.price').val()
-	return value.toFixed(0)
-}
-
-function convertDownToPct( form_id ){
-	var value = p.find('.dollars-dow').val() / p.find('.price').val()
-	return value.toFixed(2)
 }
 
 function makeMortageFromForm( form_id )
@@ -136,34 +41,6 @@ function makeMortageFromForm( form_id )
 	//	tax 	= $('property-tax')
 	return new Mortgage( o )
 
-}
-
-
-function calcPayment( form_id ){  
-	var p = $(form_id),
-		P = p.find('.price').val() * (1- p.find('.pct-down').val()/100.0 )
-		i = p.find('.apr').val() / 1200.0
-		n = p.find('.term').val() * 12.0
-		In = Math.pow( (1 + i), n )
-
-	console.log( i + ',' + n +',' +In)
-	var payment = P * ( ( i * In) / (In - 1) )
-	console.log( payment)
-	return payment = payment.toFixed(2)
-	
-}
-
-function calculatePayment( price, down, apr, term ){  
-		var P = price - down,
-			i =  apr / 1200.0
-			n = term * 12.0
-			In = Math.pow( (1 + i), n ),
-			payment = 0
-	
-	 payment = ( P * ( ( i * In) / (In - 1) ).toFixed(2)
-	
-	return payment 
-	
 }
 
 function updateMortgage( form_id ){
@@ -198,54 +75,6 @@ now_mtg.views = [ now_mtg.id + ' .price', now_mtg.id + ' .pct-down', now_mtg.id 
 
 
 
-function i( apr ){ apr / 12.0 }
-function n( term, periods ){ term * periods }
-function principal( price, down ){ price - down }
-
-function HomePurchase( price, down, apr, term){
-	this.price = price ? price : 100000.00;
-	this.down = down ? down : 20000.0;
-	this.apr = apr ? apr : .04;
-	this.term = term ? term : 30; //years
-}
-
-HomePurchase.prototype = {
-    principal: function(){
-        return this.price - this.down;
-    },
-    iN: function(){
-    	Math.pow( (1 + this.i ), this.n() );
-    },
-    payment: function(){
-    	return 'payment';
-    }
-};
-
-function principalPaid( payment, principal, rate){
-	rate = ( rate > 1 ) ? rate / 100.0 : rate
-	
-	var interest_accrued = principal * rate,
-		principal_paid = payment - interest_accrued
-
-		return principal_paid
-}
-
-/*
-Object.defineProperty( HomePurchase.prototype, 'i', {
-	get: function(){ return this.apr / 12.0 },
-});
-*/
-Object.defineProperty( HomePurchase.prototype, 'n', {
-	get: function(){ return this.term * 12.0 },
-});
-
-Object.defineProperty( HomePurchase.prototype, 'payment', {
-	get: function(){ return this.term * 12.0 },
-});
-
-Object.defineProperty( HomePurchase.prototype, 'payment', {
-	get: function(){ return this.term * 12.0 },
-});
 
 var then_mtg = {}
 then_mtg.$p = $(mtgs.then)
