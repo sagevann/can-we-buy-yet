@@ -221,6 +221,14 @@ HomePurchase.prototype = {
     }
 };
 
+function principalPaid( payment, principal, rate){
+	rate = ( rate > 1 ) ? rate / 100.0 : rate
+	
+	var interest_accrued = principal * rate,
+		principal_paid = payment - interest_accrued
+
+		return principal_paid
+}
 
 /*
 Object.defineProperty( HomePurchase.prototype, 'i', {
