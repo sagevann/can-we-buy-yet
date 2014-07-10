@@ -107,16 +107,7 @@ function downPayment( P, i ){
 	//fee_pct
 	//tax_pct
 	//d_by_pct
-	var HomePurchase = Backbone.Model.extend({
-		defaults:{
-			
-
-		},
-		initialize: function(){
-		
-		}
-
-	});//HomePurchase
+	
 */
 
 function convertDownToDollars( form_id ){
@@ -162,16 +153,16 @@ function calcPayment( form_id ){
 	
 }
 
-function calcPmt( P, d,  i, n ){  
-		P = P - d
-		i =  i / 1200.0
-		n = n * 12.0
-		In = Math.pow( (1 + i), n )
-
-	//console.log( i + ',' + n +',' +In)
-	var payment = P * ( ( i * In) / (In - 1) )
-	console.log( payment)
-	return payment = payment.toFixed(2)
+function calculatePayment( price, down, apr, term ){  
+		var P = price - down,
+			i =  apr / 1200.0
+			n = term * 12.0
+			In = Math.pow( (1 + i), n ),
+			payment = 0
+	
+	 payment = ( P * ( ( i * In) / (In - 1) ).toFixed(2)
+	
+	return payment 
 	
 }
 
@@ -204,6 +195,49 @@ now_mtg.$pctDown =	now_mtg.$p.find('.pct-down')
 now_mtg.$apr = 		now_mtg.$p.find('.apr')
 now_mtg.$term = 	now_mtg.$p.find('.term')
 now_mtg.views = [ now_mtg.id + ' .price', now_mtg.id + ' .pct-down', now_mtg.id + ' .apr', now_mtg.id + ' .term']
+
+
+
+function i( apr ){ apr / 12.0 }
+function n( term, periods ){ term * periods }
+function principal( price, down ){ price - down }
+
+function HomePurchase( price, down, apr, term){
+	this.price = price ? price : 100000.00;
+	this.down = down ? down : 20000.0;
+	this.apr = apr ? apr : .04;
+	this.term = term ? term : 30; //years
+}
+
+HomePurchase.prototype = {
+    principal: function(){
+        return this.price - this.down;
+    },
+    iN: function(){
+    	Math.pow( (1 + this.i ), this.n() );
+    },
+    payment: function(){
+    	return 'payment';
+    }
+};
+
+
+/*
+Object.defineProperty( HomePurchase.prototype, 'i', {
+	get: function(){ return this.apr / 12.0 },
+});
+*/
+Object.defineProperty( HomePurchase.prototype, 'n', {
+	get: function(){ return this.term * 12.0 },
+});
+
+Object.defineProperty( HomePurchase.prototype, 'payment', {
+	get: function(){ return this.term * 12.0 },
+});
+
+Object.defineProperty( HomePurchase.prototype, 'payment', {
+	get: function(){ return this.term * 12.0 },
+});
 
 var then_mtg = {}
 then_mtg.$p = $(mtgs.then)
@@ -243,6 +277,9 @@ $(function(){
 	})
 
 	$(now_mtg.views.join(',')).on('change', function(){
+
+		//update old mortgage
+		var pmt = calcPmt( $now_mtg.$price.val(), $now_mtg.$pctDown.val() * $now_mtg. )
 		now_mtg = makeMortageFromForm( mtgs.now)
 		then_mtg.updateMortgage( mtgs.now )
 		updateDown(mtgs.now)
