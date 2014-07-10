@@ -2,6 +2,7 @@ var base = {}
 base.price = 450000
 base.apr = 0.045
 base.term = 30
+base.appreciation = 10.9
 
 base.down ={}
 base.down.pct = 0.07
@@ -14,7 +15,6 @@ base.exp.rent = 300
 
 
 function mtgPrincipal( price, down, pct ){
-
 	//default to calculating by pct
 	pct = typeof pct === 'undefined' ? true : false
 
@@ -23,6 +23,22 @@ function mtgPrincipal( price, down, pct ){
 		return price - downPayment( price, down)
 	} else {
 		return price - down
+	}
+
+
+}
+
+function appreciateHouse( price, months, rate ){
+	if(typeof rate === 'undefined') rate = base.appreciation
+
+	if( months === 0 ){
+		console.log('price exiting with ' + price.toFixed(0));
+		return price.toFixed(0);
+	} else {
+		console.log( 'else ' + months)
+		price = price * (1+( rate / 1200.0) )
+		months -= 1
+		return appreciateHouse( price, months, rate)
 	}
 }
 
@@ -131,6 +147,7 @@ function makeMortageFromForm( form_id )
 
 }
 
+
 function calcPayment( form_id ){  
 	var p = $(form_id),
 		P = p.find('.price').val() * (1- p.find('.pct-down').val()/100.0 )
@@ -139,6 +156,19 @@ function calcPayment( form_id ){
 		In = Math.pow( (1 + i), n )
 
 	console.log( i + ',' + n +',' +In)
+	var payment = P * ( ( i * In) / (In - 1) )
+	console.log( payment)
+	return payment = payment.toFixed(2)
+	
+}
+
+function calcPmt( P, d,  i, n ){  
+		P = P - d
+		i =  i / 1200.0
+		n = n * 12.0
+		In = Math.pow( (1 + i), n )
+
+	//console.log( i + ',' + n +',' +In)
 	var payment = P * ( ( i * In) / (In - 1) )
 	console.log( payment)
 	return payment = payment.toFixed(2)
@@ -181,16 +211,30 @@ then_mtg.id = '#buy-then-mtg'
 then_mtg.updateDown = updateDown;
 then_mtg.updateMortgage = updateMortgage
 then_mtg.$price =	then_mtg.$p.find('.price')
-then_mtg.$pctDown =	then_mtg.$p.find('.pct-down')
-then_mtg.$apr = 		then_mtg.$p.find('.apr')
-then_mtg.$term = 	then_mtg.$p.find('.term')
-then_mtg.views = [ then_mtg.id + ' .price', then_mtg.id + ' .pct-down', then_mtg.id + ' .apr', then_mtg.id + ' .term']
+then_mtg.$sPeriod =	then_mtg.$p.find('.saving-period')
 
+function updateNewMortgage( ){
+	var p = $('.old-price .price').val(),
+		m = $('.saving-period').val(),
+		r = $('.app-rate').val(),
+		d = now_mtg.$pctDown.val( ) 
+		np = appreciateHouse( p, m, r)
+		console.log('price is ' + np)
+
+		$('.new-price .price').val( np)
+		d = np * d / 100.0
+		
+		var pmt = calcPmt( np, d, now_mtg.$apr.val(), now_mtg.$term.val())
+		console.log('pmt for new = ' + pmt)
+		then_mtg.$p.find('.payment').text(pmt)
+
+}
 
 $(function(){
 
 	now_mtg.updateMortgage( mtgs.now)
 	then_mtg.updateMortgage( mtgs.then)
+	updateNewMortgage()
 	
 	$('#calculate-payment').click( function(e){
 		e.preventDefault();
@@ -199,17 +243,17 @@ $(function(){
 	})
 
 	$(now_mtg.views.join(',')).on('change', function(){
-		//now_mtg = makeMortageFromForm( mtgs.now)
-		now_mtg.updateMortgage( mtgs.now )
+		now_mtg = makeMortageFromForm( mtgs.now)
+		then_mtg.updateMortgage( mtgs.now )
 		updateDown(mtgs.now)
 
 	})
 
-	$(then_mtg.views.join(',')).on('change', function(){
+	$(then_mtg.$sPeriod).on('change', function(){
+		updateNewMortgage()
 		//now_mtg = makeMortageFromForm( mtgs.now)
 		console.log('then')
-		then_mtg.updateMortgage( mtgs.then )
-		updateDown(mtgs.then)
+		//updateDown(mtgs.then)
 
 	})
 
