@@ -17,6 +17,7 @@ function CashFlow( ){
 	}
 }
 
+
 Object.defineProperties( CashFlow.prototype,
 	 		{ 
 	 			expenses:   { get: function(){ return this.housing + this.out + this.purchases } },
@@ -52,8 +53,95 @@ function Simulation( ){
 	}
 }
 
+//sum up properties of objects in an array
+function sumObjects( a, obj, prop){
+	return a.reduce( function(p, c, i, arr){ return p + arr[i][obj][prop] });
+}
+
 function Purchase( item, cost){
 	this.item = item ? item : 'EXPENSE'
 	this.cost = cost ? cost : 0
 }
+
+	function makeCashFlowRow( cfa, prop, row_class ){
+		var el = $(row_class)
+		for( var i = 0; i < cfa.length; i ++){ el.append('<td>$'+cfa[i].cashflow[prop]+'</td>') }
+	}
+
+	function makePeriodsRow( c ){
+		var el=$('.periods')
+		for( var i = 0; i < c.length; i ++){ el.append('<td>Month '+i+'</td>') }
+	} 
+
+
+function makeSimulation(){
+	var m_i = Number($('#m-income').val()), 
+		m_o = Number($('#m-spending').val()),
+		m_h = Number($('#m-housing').val())
+
+	console.log( 'ms ' + m_h +','+m_o+','+m_i)
+	return new Simulation( { periods: 36, cashFlow: new CashFlow( { in: m_i, out: m_o, housing: m_h }) });
+}
+
+function makePurchasesRow( cfa ){
+		var el = $('.purchases'),
+			p = 0
+
+		for( var i = 0; i < cfa.length; i ++){ 
+			var c = 0, s = ''
+			console.log('i ' + i +', ' + sim.purchases[i])
+			if( sim.purchases[i]  ){c = sim.purchases[i].cost; s='red'}
+			el.append('<td class="'+s+'">$'+c+'</td>') 
+		}
+	}
+function makeNetRow(cfa){
+	var el = $('.net'),
+		ex = 0
+		for( var i = 0; i < cfa.length; i ++){ 
+			
+			console.log('i ' + i +', ' + sim.purchases[i])
+			if( sim.purchases[i]  ){ex += sim.purchases[i].cost;}
+			f = cfa[i].cashflow.savings - ex
+			el.append('<td>$'+f+'</td>') 
+		}
+
+}
+
+function addPurchaseToSim(){
+	var p = Number($('#p-time').val()),
+		item = $('#p-item').val(),
+		cost = Number($('#p-cost').val())
+
+	console.log( 'adding ' + p +',' +item+','+cost)
+
+	purchases.push({ p:p, purch: new Purchase(item, cost)})
+}
+
+
+var purchases = []
+var sim = new Simulation( { periods: 36, cashFlow: new CashFlow( { in: 12000.0, out: 7500.0, housing: 300.0 }) });
+
+$(function(){
+	
+	var s = new Simulation( { periods: 36, cashFlow: new CashFlow( { in: 12000.0, out: 7500.0, housing: 300.0 }) });
+	//var c = s.cumulative(12)
+	
+	$('.make-cashflow').click(function(){ sim = makeSimulation(); makeCashFlowTable( sim.cumulative(12) ) })
+	$('.add-purchase').click(function(){ addPurchaseToSim() })
+
+	var makeCashFlowTable =function(c){
+		makePeriodsRow(c)
+		makeCashFlowRow(c, 'in', '.income')
+		makeCashFlowRow(c, 'expenses', '.expenses')
+		makeCashFlowRow(c, 'savings', '.savings')
+		for(var i = 0; i < purchases.length; i++){
+
+			sim.newPurchase( purchases[i].p, purchases[i].purch)
+		}
+		makePurchasesRow(c)
+		makeNetRow(c)
+	}
+});
+
+
 
