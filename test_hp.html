@@ -33,21 +33,11 @@
         <div class="container well">
           <pre> sim.newPurchase( {period: 3, new Purchase( 'item', cost)</pre>
          
-            <div class="form-group col-md-4">
-             <label for="p-time">Month of Purchase</label>
-              <div class="input-group">
-
-                <div class="input-group-addon"></div>
-                <input type="number" class="form-control" id="p-time" placeholder="0">
-              </div>
-            </div>
+            
             <div class="form-group col-md-4">
              <label for="p-item">Item</label>
-              <div class="input-group">
-             
-                <div class="input-group-addon">$</div>
+              
                 <input class="form-control" type="text" id="p-item" placeholder="New Car">
-              </div>
             </div>
             <div class="form-group col-md-4">
              <label for="p-cost">cost</label>
@@ -55,6 +45,23 @@
              
                 <div class="input-group-addon">$</div>
                 <input class="form-control" type="number" id="p-cost" placeholder="$500">
+              </div>
+            </div>
+            <div class="form-group col-md-4">
+             <label for="p-monthly">monthly</label>
+              <div class="input-group">
+             
+                <div class="input-group-addon">$</div>
+                <input class="form-control" type="number" id="p-monthly" placeholder="$500">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+             <label for="p-time">Purchase Period</label>
+              <div class="input-group">
+                <div class="btn-group period-btns">
+                  
+                </div>
+                <input type="hidden" class="form-control" id="p-time" placeholder="0">
               </div>
             </div>
            <button class="btn btn-success add-purchase">Add Purchase</button>
@@ -124,9 +131,10 @@
         </div>
 
         <script src="js/vendor/bootstrap.min.js"></script>
-
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
         <script src="js/homepurchase.js"></script>
-        <script src="js/cashflow.js"></script>
+        <script src="js/cashflow_nosim.js"></script>
+       
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=

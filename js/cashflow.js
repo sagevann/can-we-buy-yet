@@ -119,6 +119,8 @@ function addPurchaseToSim(){
 
 
 var purchases = []
+var periods = { '1m': 1, '3m': 3, '6m': 6, '1Y':12, '2Y':24, '3Y':36, '5Y':60, '10Y':120, '15Y':15*12, '20Y':240, '30Y':360 }
+
 var sim = new Simulation( { periods: 36, cashFlow: new CashFlow( { in: 12000.0, out: 7500.0, housing: 300.0 }) });
 
 $(function(){
